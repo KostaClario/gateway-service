@@ -10,6 +10,8 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -17,8 +19,24 @@ public class JwtAuthorizationFilter implements GatewayFilter {
 
     private final JwtUtil jwtUtil;
 
+    // 화이트리스트
+    private static final List<String> WHITELIST = List.of(
+            "/oauth2",
+            "/login/oauth2/",
+            "/token/refresh",
+            "api/member/join"
+    );
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        String path = exchange.getRequest().getURI().getPath();
+
+        if (WHITELIST.stream().anyMatch(path::startsWith)) {
+            log.info("[GATEWAY] Bypassing JWT for path: {}", path);
+            return chain.filter(exchange);
+        }
+
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
