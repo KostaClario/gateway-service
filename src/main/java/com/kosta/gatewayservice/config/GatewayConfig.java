@@ -18,7 +18,7 @@ public class GatewayConfig {
     public RouteLocator routeLocator(RouteLocatorBuilder builder, LoggingGatewayFilterFactory loggingGatewayFilterFactory) {
         return builder.routes()
                 .route("user-service", r -> r
-                        .path("/oauth2/**", "/login/**", "/api/member", "/token/**")
+                        .path("/oauth2/**", "/login/**", "/api/member/**", "/token/**")
                         .filters(f -> f
                                 .filter(jwtAuthorizationFilter)
                                 .filter(loggingGatewayFilterFactory.apply(new LoggingGatewayFilterFactory.Config()))
