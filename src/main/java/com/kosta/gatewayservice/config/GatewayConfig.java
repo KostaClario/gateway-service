@@ -18,12 +18,24 @@ public class GatewayConfig {
     public RouteLocator routeLocator(RouteLocatorBuilder builder, LoggingGatewayFilterFactory loggingGatewayFilterFactory) {
         return builder.routes()
                 .route("user-service", r -> r
-                        .path("/oauth2/**", "/login/**", "/api/member/**", "/token/**")
+                        .path("/oauth2/**", "/login/**", "/api/member/**", "/token/**",
+                                "/api/send-code","/api/verify-code")
                         .filters(f -> f
                                 .filter(jwtAuthorizationFilter)
                                 .filter(loggingGatewayFilterFactory.apply(new LoggingGatewayFilterFactory.Config()))
                         )
                         .uri("lb://user-service"))
+
+
+                .route("bankdetail-service", r -> r
+                        .path("/bank-detail/**")
+                        .filters(f -> f
+                                .filter(jwtAuthorizationFilter)
+                                .filter(loggingGatewayFilterFactory.apply(new LoggingGatewayFilterFactory.Config()))
+                        )
+                        .uri("lb://bankdetail-service"))
+
+
                 .build();
     }
 }
